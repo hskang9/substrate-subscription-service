@@ -19,13 +19,12 @@ pub trait Trait: system::Trait {
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
+
 // This module's storage items.
 decl_storage! {
 	trait Store for Module<T: Trait> as TemplateModule {
-		// Just a dummy storage item.
-		// Here we are declaring a StorageValue, `Something` as a Option<u32>
-		// `get(something)` is the default getter which returns either the stored `u32` or `None` if nothing stored
 		Something get(something): Option<u32>;
+		Calls get(call): map T::BlockNumber => Vec<T::AccountId> 
 	}
 }
 
@@ -36,6 +35,15 @@ decl_module! {
 		// Initializing events
 		// this is needed only if you are using events in your module
 		fn deposit_event() = default;
+
+		fn on_initialize(block_number: T::BlockNumber) {
+			let subscribers = Self::call(block_number);
+			for i in subscribers {
+				if let Err(e) = Self::process_subscription(i) {
+					sr_primitives::print(e);
+				}
+			}
+		}
 
 		// Just a dummy entry point.
 		// function that can be called by the external world as an extrinsics call
@@ -55,14 +63,48 @@ decl_module! {
 	}
 }
 
+
+
 decl_event!(
 	pub enum Event<T> where AccountId = <T as system::Trait>::AccountId {
-		// Just a dummy event.
-		// Event `Something` is declared with a parameter of the type `u32` and `AccountId`
-		// To emit this event, we call the deposit funtion, from our runtime funtions
-		SomethingStored(u32, AccountId),
+		SubscriptionPaid(AccountId),
 	}
 );
+
+
+impl<T: trait> Module<T> {
+
+	pub fn process_subscription(account: T::AccountId) -> Result {
+		return Ok(());
+	}
+	
+	pub fn to_balance(u: u32, digit: &str) -> T::Balance {
+		let power = |u: u32, p: u32| -> T::Balance {
+			let mut base = T::Balance::from(u);
+			for _i in 0..p { 
+				base *= T::Balance::from(10)
+			}
+			return base;
+		};
+		let result = match digit  {
+			"femto" => T::Balance::from(u),
+			"nano" =>  power(u, 3),
+			"micro" => power(u, 6),
+			"milli" => power(u, 9),
+			"one" => power(u,12),
+			"kilo" => power(u, 15),
+			"mega" => power(u, 18),
+			"giga" => power(u, 21),
+			"tera" => power(u, 24),
+			"peta" => power(u, 27),
+			"exa" => power(u, 30),
+			"zetta" => power(u, 33),
+			"yotta" => power(u, 36),
+			_ => T::Balance::from(u)
+		}; 
+		result 
+	}
+}
 
 /// tests for this module
 #[cfg(test)]
