@@ -1,76 +1,81 @@
-# Substrate Node Template
+# Substrate-Alarm-Clock
 
-A new SRML-based Substrate node, ready for hacking.
+Ethereum-alarm-clock in substrate runtime.
 
-## Build
+Vitalik says it is valuable [here](https://chronologic.network/).
 
-Install Rust:
+![](https://youtu.be/SSJUIHrkWhY)
 
-```bash
-curl https://sh.rustup.rs -sSf | sh
+Difference from EAC is that we count time as block, assuming a block is generally finalized in 6 seconds.
+
+Check out the [HOWTO](HOWTO.md) to learn how to use this for your own runtime module.
+
+This README should act as a general template for distributing your module to others.
+
+## Purpose
+
+This module acts as a template for building other runtime modules.
+
+It currently allows a user to put a `u32` value into storage, which triggers a runtime event.
+
+## Dependencies
+
+### Traits
+
+This module does not depend on any externally defined traits.
+
+### Modules
+
+This module does not depend on any other SRML or externally developed modules.
+
+## Installation
+
+### Runtime `Cargo.toml`
+
+To add this module to your runtime, simply include the following to your runtime's `Cargo.toml` file:
+
+```rust
+[dependencies.substrate-module-template]
+default_features = false
+git = 'https://github.com/substrate-developer-hub/substrate-module-template.git'
 ```
 
-Initialize your Wasm Build environment:
+and update your runtime's `std` feature to include this module:
 
-```bash
-./scripts/init.sh
+```rust
+std = [
+    ...
+    'example_module/std',
+]
 ```
 
-Build Wasm and native code:
+### Runtime `lib.rs`
 
-```bash
-cargo build --release
+You should implement it's trait like so:
+
+```rust
+/// Used for the module test_module
+impl substrate_module_template::Trait for Runtime {
+	type Event = Event;
+}
 ```
 
-## Run
+and include it in your `construct_runtime!` macro:
 
-### Single node development chain
-
-Purge any existing development chain state:
-
-```bash
-./target/release/node-template purge-chain --dev
+```rust
+ExampleModule: substrate_module_template::{Module, Call, Storage, Event<T>},
 ```
 
-Start a development chain with:
+### Genesis Configuration
 
-```bash
-./target/release/node-template --dev
+This template module does not have any genesis configuration.
+
+## Reference Docs
+
+You can view the reference docs for this module by running:
+
+```
+cargo doc --open
 ```
 
-Detailed logs may be shown by running the node with the following environment variables set: `RUST_LOG=debug RUST_BACKTRACE=1 cargo run -- --dev`.
-
-### Multi-node local testnet
-
-If you want to see the multi-node consensus algorithm in action locally, then you can create a local testnet with two validator nodes for Alice and Bob, who are the initial authorities of the genesis chain that have been endowed with testnet units.
-
-Optionally, give each node a name and expose them so they are listed on the Polkadot [telemetry site](https://telemetry.polkadot.io/#/Local%20Testnet).
-
-You'll need two terminal windows open.
-
-We'll start Alice's substrate node first on default TCP port 30333 with her chain database stored locally at `/tmp/alice`. The bootnode ID of her node is `QmRpheLN4JWdAnY7HGJfWFNbfkQCb6tFf4vvA6hgjMZKrR`, which is generated from the `--node-key` value that we specify below:
-
-```bash
-cargo run -- \
-  --base-path /tmp/alice \
-  --chain=local \
-  --alice \
-  --node-key 0000000000000000000000000000000000000000000000000000000000000001 \
-  --telemetry-url ws://telemetry.polkadot.io:1024 \
-  --validator
-```
-
-In the second terminal, we'll start Bob's substrate node on a different TCP port of 30334, and with his chain database stored locally at `/tmp/bob`. We'll specify a value for the `--bootnodes` option that will connect his node to Alice's bootnode ID on TCP port 30333:
-
-```bash
-cargo run -- \
-  --base-path /tmp/bob \
-  --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/QmRpheLN4JWdAnY7HGJfWFNbfkQCb6tFf4vvA6hgjMZKrR \
-  --chain=local \
-  --bob \
-  --port 30334 \
-  --telemetry-url ws://telemetry.polkadot.io:1024 \
-  --validator
-```
-
-Additional CLI usage options are available and may be shown by running `cargo run -- --help`.
+or by visiting this site: <Add Your Link>
