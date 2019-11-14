@@ -1,13 +1,16 @@
 # Substrate-Alarm-Clock
 
-Ethereum-alarm-clock in substrate runtime.
+Subscription service in runtime.
 
+
+## Future plans
+- integrate this with parity ink!. need to look how it works though.
+
+It may be like EAC. 
 Vitalik says it is valuable [here](https://chronologic.network/).
 
 [![Chronologic](http://img.youtube.com/vi/SSJUIHrkWhY/0.jpg)](https://www.youtube.com/watch?v=SSJUIHrkWhY "Audi R8")
 
-## Future plans
-- integrate this with parity ink!. need to look how it works though.
 
 Difference from EAC is that we count time as block, assuming a block is generally finalized in 6 seconds.
 
